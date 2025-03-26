@@ -1,1 +1,1 @@
-Commonly used Prometheus rules.
+📚 Commonly used Prometheus rules.
