@@ -1,0 +1,86 @@
+groups:
+
+- name: CategrafMySQLMetrics
+
+  rules:
+
+    - alert: MySQLSlowQueries
+      expr: increase(mysql_global_status_slow_queries[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Slow Queries detected"
+        description: "Slow queries detected. {{ $value }} slow queries in last 5 minutes. LABELS = {{ $labels }}"
+
+    - alert: MySQLHighConnUsage
+      expr: mysql_global_status_threads_running / mysql_global_variables_max_connections * 100 > 75
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High Conn Usage detected"
+        description: "High conn usage. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: MySQLUptimeLessThan300
+      expr: mysql_global_status_uptime < 300
+      for: 0m
+      labels:
+        severity: info
+      annotations:
+        summary: "MySQL Uptime Less Than 300. restarted?"
+        description: "MySQL uptime less than 300 seconds. VALUE = {{ $value }} seconds LABELS = {{ $labels }}"
+
+    - alert: MySQLHighOpenFiles
+      expr: mysql_global_status_open_files / mysql_global_variables_open_files_limit * 100 > 85
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High Open Files detected"
+        description: "High open files detected. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: MySQLInstanceDown
+      expr: mysql_up == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MySQL Instance Down"
+        description: "MySQL instance is down. LABELS = {{ $labels }}"
+
+    - alert: MySQLInnodbLogWaits
+      expr: rate(mysql_global_status_innodb_log_waits[5m]) > 10
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Innodb Log Waits detected"
+        description: "Innodb log waits detected. VALUE = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: MySQLSlaveIOThreadNotRunning
+      expr: ( mysql_slave_status_slave_io_running and ON (ident, instance) mysql_slave_status_master_server_id > 0 ) == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: MySQL Slave IO thread not running
+        description: "MySQL Slave IO thread not running. VALUE = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: MySQLSlaveSqlThreadNotRunning
+      expr: ( mysql_slave_status_slave_sql_running and ON (ident, instance) mysql_slave_status_master_server_id > 0) == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: MySQL Slave SQL thread not running
+        description: "MySQL Slave SQL thread not running. VALUE = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: MySQLSlaveReplicationLag
+      expr: ( (mysql_slave_status_seconds_behind_master - mysql_slave_status_sql_delay) and ON (ident, instance) mysql_slave_status_master_server_id > 0 ) > 30
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: MySQL Slave replication lag
+        description: "MySQL replication lag too big. VALUE = {{ $value }} LABELS = {{ $labels }}"
