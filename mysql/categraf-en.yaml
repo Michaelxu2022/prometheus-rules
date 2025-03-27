@@ -4,6 +4,15 @@ groups:
 
   rules:
 
+    - alert: MySQLInstanceDown
+      expr: mysql_up == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MySQL Instance Down"
+        description: "MySQL instance is down. LABELS = {{ $labels }}"
+
     - alert: MySQLSlowQueries
       expr: increase(mysql_global_status_slow_queries[5m]) > 0
       for: 0m
@@ -13,14 +22,23 @@ groups:
         summary: "Slow Queries detected"
         description: "Slow queries detected. {{ $value }} slow queries in last 5 minutes. LABELS = {{ $labels }}"
 
-    - alert: MySQLHighConnUsage
-      expr: mysql_global_status_threads_running / mysql_global_variables_max_connections * 100 > 75
+    - alert: MySQLHighConnRunning
+      expr: mysql_global_status_threads_running / mysql_global_variables_max_connections * 100 > 60
       for: 2m
       labels:
         severity: warning
       annotations:
-        summary: "High Conn Usage detected"
-        description: "High conn usage. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+        summary: "High Connections Running detected"
+        description: "High connections running detected. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: MySQLHighConnConnected
+      expr: mysql_global_status_threads_connected / mysql_global_variables_max_connections * 100 > 80
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High Connections Connected detected"
+        description: "High connections connected detected. VALUE = {{ $value }}% LABELS = {{ $labels }}"
 
     - alert: MySQLUptimeLessThan300
       expr: mysql_global_status_uptime < 300
@@ -39,15 +57,6 @@ groups:
       annotations:
         summary: "High Open Files detected"
         description: "High open files detected. VALUE = {{ $value }}% LABELS = {{ $labels }}"
-
-    - alert: MySQLInstanceDown
-      expr: mysql_up == 0
-      for: 1m
-      labels:
-        severity: critical
-      annotations:
-        summary: "MySQL Instance Down"
-        description: "MySQL instance is down. LABELS = {{ $labels }}"
 
     - alert: MySQLInnodbLogWaits
       expr: rate(mysql_global_status_innodb_log_waits[5m]) > 10
