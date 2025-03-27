@@ -1,0 +1,77 @@
+groups:
+
+- name: Nightingale
+
+  rules:
+
+    - alert: NightingaleJobMissing
+      expr: 'absent(up{job="nightingale"})'
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: Nightingale job missing (instance {{ $labels.instance }})
+        description: "A Nightingale job has disappeared\n  VALUE = {{ $value }}\n  LABELS = {{ $labels }}"
+
+    - alert: NightingaleSyncRecordsTooSlow
+      expr: 'n9e_cron_duration > 5000'
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Nightingale sync records too slow (instance {{ $labels.instance }})
+        description: "Nightingale sync records too slow {{ $value }}ms\n  LABELS = {{ $labels }}"
+
+    - alert: NightingaleEvalRuleError
+      expr: 'rate(n9e_alert_rule_eval_error_total[5m]) > 0'
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: Nightingale eval rule error (instance {{ $labels.instance }})
+        description: "Nightingale eval rule error\n  VALUE = {{ $value }} errors/second\n  LABELS = {{ $labels }}"
+
+    - alert: NightingaleAlertingQueueSizeTooLarge
+      expr: 'n9e_alert_alert_queue_size > 1000'
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: Nightingale alerting queue size too large (instance {{ $labels.instance }})
+        description: "Nightingale alerting queue size too large {{ $value }}\n  LABELS = {{ $labels }}"
+
+    - alert: NightingaleForwardTimeSeriesError
+      expr: 'rate(n9e_pushgw_write_error_total[5m]) > 0'
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: Nightingale forward time series error (instance {{ $labels.instance }})
+        description: "Nightingale forward time series error\n  VALUE = {{ $value }} samples/second\n  LABELS = {{ $labels }}"
+
+    - alert: NightingalePushgatewayQueueSizeTooLarge
+      expr: 'n9e_pushgw_sample_queue_size > 900000'
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: Nightingale pushgateway queue size too large (instance {{ $labels.instance }})
+        description: "Nightingale pushgateway queue size too large {{ $value }}\n  LABELS = {{ $labels }}"
+
+    - alert: NightingalePushgatewayQueueSizeTooLarge
+      expr: 'n9e_pushgw_sample_queue_size > 900000'
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: Nightingale pushgateway queue size too large (instance {{ $labels.instance }})
+        description: "Nightingale pushgateway queue size too large {{ $value }}\n  LABELS = {{ $labels }}"
+
+    - alert: NightingaleForwardDurationTooLarge
+      expr: 'histogram_quantile(0.95, rate(n9e_pushgw_forward_duration_seconds_bucket[5m])) > 0.5'
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: Nightingale forward duration too large (instance {{ $labels.instance }})
+        description: "Nightingale forward duration too large VALUE = {{ $value }} seconds\n  LABELS = {{ $labels }}"
