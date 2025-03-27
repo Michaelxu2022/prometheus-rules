@@ -1,0 +1,203 @@
+groups:
+
+- name: CategrafLinuxMetrics
+
+  rules:
+
+    - alert: HighCpuLoad
+      expr: cpu_usage_active > 85
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High CPU load detected"
+        description: "High cpu load. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: HighMemUsage
+      expr: mem_available_percent < 20
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High Memory Usage detected"
+        description: "High memory usage. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: HighDiskIOUtil
+      expr: rate(diskio_io_time[1m])/10 > 99
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High Disk IO Utilization detected"
+        description: "High disk io utilization. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: BigDiskSpaceLow
+      expr: disk_free/1024/1024/1024 < 20 and disk_total/1024/1024/1024 >= 200
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Big Disk Space Low detected"
+        description: "Big disk space low. VALUE = {{ $value }}GB LABELS = {{ $labels }}"
+
+    - alert: SmallDiskSpaceLow
+      expr: disk_used_percent > 90 and disk_total/1024/1024/1024 < 200
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Small Disk Space Low detected"
+        description: "Small disk space low. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: HighDiskInodeUtil
+      expr: disk_inodes_used/disk_inodes_total * 100 > 90
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High Disk Inode Utilization detected"
+        description: "High disk inode utilization. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: DiskDeviceError
+      expr: disk_device_error > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Disk Device Error detected"
+        description: "Disk device error. error code = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: NetworkInPacketDrop
+      expr: increase(net_drop_in[2m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Network In Packet Drop detected"
+        description: "Network in packet drop. {{ $value }} packets dropped in last 2 minutes. LABELS = {{ $labels }}"
+
+    - alert: NetworkOutPacketDrop
+      expr: increase(net_drop_out[2m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Network Out Packet Drop detected"
+        description: "Network out packet drop. {{ $value }} packets dropped in last 2 minutes. LABELS = {{ $labels }}"
+
+    - alert: NetworkInPacketError
+      expr: increase(net_err_in[2m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Network In Packet Error detected"
+        description: "Network in packet error. {{ $value }} error packets in last 2 minutes. LABELS = {{ $labels }}"
+
+    - alert: NetworkOutPacketError
+      expr: increase(net_err_out[2m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Network Out Packet Error detected"
+        description: "Network out packet error. {{ $value }} error packets in last 2 minutes. LABELS = {{ $labels }}"
+
+    - alert: HighConntrackUsage
+      expr: conntrack_ip_conntrack_count / ip_conntrack_max * 100 > 85
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High Conntrack Usage detected"
+        description: "High conntrack usage. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: HighSystemFilefdUsage
+      expr: linux_sysctl_fs_file_nr/linux_sysctl_fs_file_max * 100 > 90
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High System Filefd Usage detected"
+        description: "High system filefd usage. VALUE = {{ $value }}% LABELS = {{ $labels }}"
+
+    - alert: HighTcpTimeWaitConnections
+      expr: netstat_tcp_time_wait > 20000
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "High TCP Time Wait Connections detected"
+        description: "High tcp time wait connections. VALUE = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: OOMKill
+      expr: increase(kernel_vmstat_oom_kill[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "OOM Kill detected"
+        description: "OOM kill detected in last 5 minutes. COUNT = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: NTPTimeOffset
+      expr: ntp_offset_ms > 1000 or ntp_offset_ms < -1000
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "NTP Time Offset detected"
+        description: "NTP time offset. VALUE = {{ $value }}ms LABELS = {{ $labels }}"
+
+    - alert: PingFailed
+      expr: ping_result_code != 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Ping Failed detected"
+        description: "Ping failed. result code = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: HTTPResponseError
+      expr: http_response_result_code != 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "HTTP Response Error detected"
+        description: "HTTP response error. result code = {{ $value }} LABELS = {{ $labels }} \n\n Value: 1-ConnectionFailed, 2-Timeout, 3-DNSError, 4-AddressError, 5-BodyMismatch, 6-CodeMismatch"
+
+    - alert: NetResponseError
+      expr: net_response_result_code != 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "NET Response Error detected"
+        description: "NET response error. result code = {{ $value }} LABELS = {{ $labels }} \n\n Value: 1-Timeout, 2-ConnectionFailed, 3-ReadFailed, 4-StringMismatch"
+
+    - alert: ProcessDown
+      expr: procstat_lookup_count == 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Process Down detected"
+        description: "Process down. LABELS = {{ $labels }}"
+
+    - alert: ProcessLimitFDTooLow
+      expr: procstat_rlimit_num_fds_soft < 2048
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Process Limit FD Too Low detected"
+        description: "Process limit fd too low. VALUE = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: ProcessTooMany
+      expr: processes_total > 600
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Process Too Many detected"
+        description: "Process too many. Process count = {{ $value }} LABELS = {{ $labels }}"
