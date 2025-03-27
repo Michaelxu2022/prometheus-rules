@@ -1,0 +1,116 @@
+groups:
+
+- name: AutoMQ
+
+  rules:
+
+    - alert: KafkaActiveControllerCountError
+      expr: sum(kafka_controller_active_count) by (job) != 1
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka active controller count error"
+        description: "Kafka active controller count = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: KafkaServerConnectionCountTooHigh
+      expr: sum(kafka_server_connection_count) by (job, instance) > 1000
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka server connection count too high"
+        description: "Kafka server connection count = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: KafkaFetchRequestLatencyTooHigh
+      expr: kafka_request_time_99p_milliseconds{type="Fetch"} > 1000
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka request latency too high"
+        description: "Kafka request latency = {{ $value }}ms LABELS = {{ $labels }}"
+
+    - alert: KafkaPartitionCountTooHigh
+      expr: kafka_partition_count > 5000
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka partition count too high"
+        description: "Kafka partition count = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: KafkaProduceRequestLatencyTooHigh
+      expr: kafka_request_time_99p_milliseconds{type="Produce"} > 100
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka produce request latency too high"
+        description: "Kafka produce request latency = {{ $value }}ms LABELS = {{ $labels }}"
+
+    - alert: KafkaFetchRequestTooHigh
+      expr: sum(rate(kafka_request_count_total{type="Fetch"}[1m])) by (job, instance) > 1000
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka fetch request too high"
+        description: "Kafka fetch request = {{ $value }} requests/second LABELS = {{ $labels }}"
+
+    - alert: KafkaProduceRequestTooHigh
+      expr: sum(rate(kafka_request_count_total{type="Produce"}[1m])) by (job, instance) > 1000
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka produce request too high"
+        description: "Kafka produce request = {{ $value }} requests/second LABELS = {{ $labels }}"
+
+    - alert: KafkaConsumeLagTooHigh
+      expr: |
+        sum(max(kafka_log_end_offset) by (job, topic, partition)) by (job, topic)
+        - on (topic) group_left (consumer_group)
+        sum(max(kafka_group_commit_offset) by (job, consumer_group, topic, partition)) by (job, consumer_group, topic) > 10000
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka consume lag too high"
+        description: "Kafka consume lag = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: KafkaS3RequestFailRateTooHigh
+      expr: sum(rate(kafka_stream_operation_latency_count{operation_type="S3Request", status="failed"}[1m])) by (job, operation_name) > 0.1
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Kafka S3 request fail rate too high"
+        description: "Kafka S3 request fail rate = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: KafkaRequestErrorTooHigh
+      expr: sum(rate(kafka_request_error_count_total{error!="NONE"}[1m])) by (job, instance, error) > 0.1
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "Kafka request error too high"
+        description: "Kafka request error = {{ $value }} errors/second LABELS = {{ $labels }}"
+
+    - alert: KafkaNetworkInBytesTooHigh
+      expr: sum(rate(kafka_broker_network_io_bytes_total{direction="in"}[1m])) by (job) > 50 * 1024 * 1024
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka network in bytes too high"
+        description: "Kafka network in bytes = {{ $value }} LABELS = {{ $labels }}"
+
+    - alert: KafkaNetworkOutBytesTooHigh
+      expr: sum(rate(kafka_broker_network_io_bytes_total{direction="out"}[1m])) by (job) > 50 * 1024 * 1024
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Kafka network out bytes too high"
+        description: "Kafka network out bytes = {{ $value }} LABELS = {{ $labels }}"
