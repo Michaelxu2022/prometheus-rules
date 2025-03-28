@@ -1,0 +1,61 @@
+groups:
+
+- name: NightingaleV8
+
+  rules:
+
+    - alert: 夜莺抓取任务消失
+      expr: 'absent(up{job="nightingale"})'
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "夜莺 Scrape Job 丢失\n  告警标签 = {{ $labels }}"
+
+    - alert: 夜莺同步记录过慢
+      expr: 'n9e_cron_duration > 5000'
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "夜莺同步记录耗时：{{ $value }}ms\n  告警标签 = {{ $labels }}"
+
+    - alert: 夜莺告警规则执行遇到错误
+      expr: 'increase(n9e_alert_rule_eval_error_total[5m]) > 0'
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "最近 5 分钟执行告警规则判定时遇到的错误次数 = {{ $value }}\n  告警标签 = {{ $labels }}"
+
+    - alert: 夜莺告警事件队列堆积过多
+      expr: 'n9e_alert_alert_queue_size > 1000'
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "告警事件队列长度 = {{ $value }}\n  告警标签 = {{ $labels }}"
+
+    - alert: 夜莺转发数据出错
+      expr: 'rate(n9e_pushgw_write_error_total[5m]) > 0'
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "夜莺转发时序数据给后端时序库报错\n  VALUE = {{ $value }} samples/second\n  告警标签 = {{ $labels }}"
+
+    - alert: 夜莺转发数据所用的队列堆积过多
+      expr: 'n9e_pushgw_sample_queue_size > 900000'
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        description: "当前队列大小 = {{ $value }}，可以尝试调大队列大小或增加队列数量。\n  告警标签 = {{ $labels }}"
+
+    - alert: 夜莺调用时序库延时过高
+      expr: 'histogram_quantile(0.95, rate(n9e_pushgw_forward_duration_seconds_bucket[5m])) > 0.5'
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        description: "当前延迟数据 = {{ $value }} seconds，可能需要扩容时序库。\n  告警标签 = {{ $labels }}"

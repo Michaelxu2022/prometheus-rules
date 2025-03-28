@@ -58,15 +58,6 @@ groups:
         summary: Nightingale pushgateway queue size too large (instance {{ $labels.instance }})
         description: "Nightingale pushgateway queue size too large {{ $value }}\n  LABELS = {{ $labels }}"
 
-    - alert: NightingalePushgatewayQueueSizeTooLarge
-      expr: 'n9e_pushgw_sample_queue_size > 900000'
-      for: 1m
-      labels:
-        severity: warning
-      annotations:
-        summary: Nightingale pushgateway queue size too large (instance {{ $labels.instance }})
-        description: "Nightingale pushgateway queue size too large {{ $value }}\n  LABELS = {{ $labels }}"
-
     - alert: NightingaleForwardDurationTooLarge
       expr: 'histogram_quantile(0.95, rate(n9e_pushgw_forward_duration_seconds_bucket[5m])) > 0.5'
       for: 1m
