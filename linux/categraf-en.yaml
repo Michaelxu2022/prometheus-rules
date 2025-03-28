@@ -14,7 +14,7 @@ groups:
         description: "High cpu load. VALUE = {{ $value }}% LABELS = {{ $labels }}"
 
     - alert: HighMemUsage
-      expr: mem_available_percent < 20
+      expr: 100 - mem_available_percent > 80
       for: 1m
       labels:
         severity: warning

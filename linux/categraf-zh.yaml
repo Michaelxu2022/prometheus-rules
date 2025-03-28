@@ -1,0 +1,181 @@
+groups:
+
+- name: CategrafLinuxMetrics
+
+  rules:
+
+    - alert: 机器CPU利用率过高
+      expr: cpu_usage_active > 85
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "机器当前的 CPU 利用率达到 = {{ $value }}% 告警标签 = {{ $labels }}"
+
+    - alert: 机器内存利用率过高
+      expr: 100 - mem_available_percent > 80
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        description: "机器当前的内存利用率达到 = {{ $value }}% 告警标签 = {{ $labels }}"
+
+    - alert: 机器硬盘IO利用率过高
+      expr: rate(diskio_io_time[1m])/10 > 99
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "机器当前IO.Util = {{ $value }}% 告警标签 = {{ $labels }}"
+
+    - alert: 硬盘空间不足
+      expr: disk_free/1024/1024/1024 < 20 and disk_total/1024/1024/1024 >= 200
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "硬盘空间只剩 = {{ $value }}GB 告警标签 = {{ $labels }}"
+
+    - alert: 硬盘利用率过高
+      expr: disk_used_percent > 90 and disk_total/1024/1024/1024 < 200
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "硬盘空间利用率达到 = {{ $value }}% 告警标签 = {{ $labels }}"
+
+    - alert: 硬盘inode利用率过高
+      expr: disk_inodes_used/disk_inodes_total * 100 > 90
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "硬盘 inode 利用率达到 = {{ $value }}% 告警标签 = {{ $labels }}"
+
+    - alert: 机器硬盘错误
+      expr: disk_device_error > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "机器硬盘错误，指标为0表示正常，非0表示异常，当前指标值 = {{ $value }} 告警标签 = {{ $labels }}"
+
+    - alert: 网卡入向丢包
+      expr: increase(net_drop_in[2m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "过去 2 分钟丢了 {{ $value }} 个包。 告警标签 = {{ $labels }}"
+
+    - alert: 网卡出向丢包
+      expr: increase(net_drop_out[2m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "过去 2 分钟丢了 {{ $value }} 个包。 告警标签 = {{ $labels }}"
+
+    - alert: 网卡入向错包
+      expr: increase(net_err_in[2m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "过去 2 分钟出现 {{ $value }} 个错包。 告警标签 = {{ $labels }}"
+
+    - alert: 网卡出向错包
+      expr: increase(net_err_out[2m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "过去 2 分钟出现 {{ $value }} 个错包。 告警标签 = {{ $labels }}"
+
+    - alert: Conntrack表项利用率高
+      expr: conntrack_ip_conntrack_count / ip_conntrack_max * 100 > 85
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "Conntrack表项利用率 = {{ $value }}%，可以通过内核参数调大限制。 告警标签 = {{ $labels }}"
+
+    - alert: 系统级文件句柄利用率高
+      expr: linux_sysctl_fs_file_nr/linux_sysctl_fs_file_max * 100 > 90
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "系统级文件句柄利用率 = {{ $value }}% 告警标签 = {{ $labels }}"
+
+    - alert: TIME_WAIT连接过多
+      expr: netstat_tcp_time_wait > 20000
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "TIME_WAIT 连接数 = {{ $value }} 告警标签 = {{ $labels }}"
+
+    - alert: OOMKill
+      expr: increase(kernel_vmstat_oom_kill[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "最近 5 分钟出现 {{ $value }} 次 OOM。只有高版本内核才有这个指标。告警标签 = {{ $labels }}"
+
+    - alert: NTP时间偏移过大
+      expr: ntp_offset_ms > 1000 or ntp_offset_ms < -1000
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        description: "NTP 偏移时间 = {{ $value }}ms，一般来讲，分布式系统要求机器时间要校准。告警标签 = {{ $labels }}"
+
+    - alert: PING探测失败
+      expr: ping_result_code != 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        description: "PING探测失败，指标值为0表示正常，非0表示异常，当前值 = {{ $value }} 告警标签 = {{ $labels }}"
+
+    - alert: HTTP地址探测失败
+      expr: http_response_result_code != 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        description: "HTTP 探测失败，当前错误码 = {{ $value }}（不同错误码含义：1-ConnectionFailed, 2-Timeout, 3-DNSError, 4-AddressError, 5-BodyMismatch, 6-CodeMismatch） 告警标签 = {{ $labels }}"
+
+    - alert: TCP或UDP探测失败
+      expr: net_response_result_code != 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        description: "TCP 或 UDP 探测失败，当前错误码 = {{ $value }}（不同错误码含义：1-Timeout, 2-ConnectionFailed, 3-ReadFailed, 4-StringMismatch） 告警标签 = {{ $labels }}"
+
+    - alert: 进程挂了
+      expr: procstat_lookup_count == 0
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        description: "使用 procstat 插件发现某进程数量为0。告警标签 = {{ $labels }}"
+
+    - alert: 进程句柄限制过小
+      expr: procstat_rlimit_num_fds_soft < 2048
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        description: "使用 procstat 插件发现某进程句柄限制为 = {{ $value }} 告警标签 = {{ $labels }}"
+
+    - alert: 进程数量过多
+      expr: processes_total > 600
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        description: "进程数量过多，当前值 = {{ $value }}。请检查是否符合预期，如果符合预期请调大告警规则的阈值。告警标签 = {{ $labels }}"
