@@ -1,0 +1,95 @@
+groups:
+
+- name: CategrafMySQLMetrics
+
+  rules:
+
+    - alert: "MySQL实例无法连通"
+      expr: mysql_up == 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MySQL 实例持续 1min 无法连通"
+        description: "MySQL 实例无法连通. 告警标签 = {{ $labels }}"
+
+    - alert: "MySQL慢查询"
+      expr: increase(mysql_global_status_slow_queries[5m]) > 0
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MySQL 最近 5min 出现慢查询"
+        description: "MySQL 最近 5min 出现慢查询，出现次数 = {{ $value }} 告警标签 = {{ $labels }}"
+
+    - alert: "MySQL连接数过高"
+      expr: mysql_global_status_threads_running / mysql_global_variables_max_connections * 100 > 60
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MySQL 运行状态的连接数过高"
+        description: "MySQL 运行状态的连接数过高，占连接上限的比例 = {{ $value }}% 告警标签 = {{ $labels }}"
+
+    - alert: "MySQL连接数过多"
+      expr: mysql_global_status_threads_connected / mysql_global_variables_max_connections * 100 > 80
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MySQL 连接数过多，快要达到上限了"
+        description: "可以通过调整 global variable 增加连接上限，当前连接数占上限比例 = {{ $value }}% 告警标签 = {{ $labels }}"
+
+    - alert: "MySQL刚有重启"
+      expr: mysql_global_status_uptime < 300
+      for: 0m
+      labels:
+        severity: info
+      annotations:
+        summary: "MySQL 刚有重启，需要确认是否为预期行为"
+        description: "MySQL 在 {{ $value }} 秒内发生重启。 告警标签 = {{ $labels }}"
+
+    - alert: "MySQL打开文件数过高"
+      expr: mysql_global_status_open_files / mysql_global_variables_open_files_limit * 100 > 85
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        summary: "MySQL 打开的文件数过高"
+        description: "MySQL 打开的文件数过高，占上限的比例 = {{ $value }}% 告警标签 = {{ $labels }}"
+
+    - alert: "MySQL Innodb 日志写入等待数过高"
+      expr: rate(mysql_global_status_innodb_log_waits[5m]) > 10
+      for: 0m
+      labels:
+        severity: warning
+      annotations:
+        summary: "Innodb 日志写入等待数过高"
+        description: "Innodb 日志写入等待数过高，最近 5 分钟的平均值 = {{ $value }} 次/秒。告警标签 = {{ $labels }}"
+
+    - alert: "MySQL IO 线程未运行"
+      expr: ( mysql_slave_status_slave_io_running and ON (ident, instance) mysql_slave_status_master_server_id > 0 ) == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MySQL Slave IO 线程未运行，请检查主从同步"
+        description: "MySQL Slave IO 线程未运行，请检查主从同步。告警标签 = {{ $labels }}"
+
+    - alert: "MySQL SQL 线程未运行"
+      expr: ( mysql_slave_status_slave_sql_running and ON (ident, instance) mysql_slave_status_master_server_id > 0) == 0
+      for: 0m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MySQL Slave SQL 线程未运行，请检查主从同步"
+        description: "MySQL Slave SQL 线程未运行，请检查主从同步。告警标签 = {{ $labels }}"
+
+    - alert: "MySQL 主从延迟过高"
+      expr: ( (mysql_slave_status_seconds_behind_master - mysql_slave_status_sql_delay) and ON (ident, instance) mysql_slave_status_master_server_id > 0 ) > 30
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        summary: "MySQL 主从延迟过高"
+        description: "MySQL 主从延迟过高，当前延迟 = {{ $value }}秒。告警标签 = {{ $labels }}"
