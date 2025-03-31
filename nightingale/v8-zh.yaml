@@ -10,6 +10,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "夜莺抓取任务消失"
         description: "夜莺 Scrape Job 丢失\n  告警标签 = {{ $labels }}"
 
     - alert: 夜莺同步记录过慢
@@ -18,6 +19,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "夜莺从 DB 同步某些记录延迟过高"
         description: "夜莺同步记录耗时：{{ $value }}ms\n  告警标签 = {{ $labels }}"
 
     - alert: 夜莺告警规则执行遇到错误
@@ -26,6 +28,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "夜莺告警规则执行遇到错误"
         description: "最近 5 分钟执行告警规则判定时遇到的错误次数 = {{ $value }}\n  告警标签 = {{ $labels }}"
 
     - alert: 夜莺告警事件队列堆积过多
@@ -34,14 +37,16 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "夜莺告警事件队列堆积过多"
         description: "告警事件队列长度 = {{ $value }}\n  告警标签 = {{ $labels }}"
 
     - alert: 夜莺转发数据出错
       expr: 'rate(n9e_pushgw_write_error_total[5m]) > 0'
       for: 0m
       labels:
-        severity: warning
+        severity: critical
       annotations:
+        summary: "夜莺转发数据给后端时序库报错"
         description: "夜莺转发时序数据给后端时序库报错\n  VALUE = {{ $value }} samples/second\n  告警标签 = {{ $labels }}"
 
     - alert: 夜莺转发数据所用的队列堆积过多
@@ -50,6 +55,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "夜莺转发数据所用的队列堆积过多"
         description: "当前队列大小 = {{ $value }}，可以尝试调大队列大小或增加队列数量。\n  告警标签 = {{ $labels }}"
 
     - alert: 夜莺调用时序库延时过高
@@ -58,4 +64,5 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "夜莺调用时序库延时过高"
         description: "当前延迟数据 = {{ $value }} seconds，可能需要扩容时序库。\n  告警标签 = {{ $labels }}"

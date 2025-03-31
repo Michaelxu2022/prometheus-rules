@@ -10,6 +10,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} CPU 利用率过高"
         description: "机器当前的 CPU 利用率达到 = {{ $value }}% 告警标签 = {{ $labels }}"
 
     - alert: 机器内存利用率过高
@@ -18,6 +19,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 内存利用率过高"
         description: "机器当前的内存利用率达到 = {{ $value }}% 告警标签 = {{ $labels }}"
 
     - alert: 机器硬盘IO利用率过高
@@ -26,6 +28,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 硬盘IO利用率过高"
         description: "机器当前IO.Util = {{ $value }}% 告警标签 = {{ $labels }}"
 
     - alert: 硬盘空间不足
@@ -34,6 +37,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 硬盘空间不足"
         description: "硬盘空间只剩 = {{ $value }}GB 告警标签 = {{ $labels }}"
 
     - alert: 硬盘利用率过高
@@ -42,6 +46,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 硬盘利用率过高"
         description: "硬盘空间利用率达到 = {{ $value }}% 告警标签 = {{ $labels }}"
 
     - alert: 硬盘inode利用率过高
@@ -50,6 +55,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 硬盘 inode 利用率过高"
         description: "硬盘 inode 利用率达到 = {{ $value }}% 告警标签 = {{ $labels }}"
 
     - alert: 机器硬盘错误
@@ -58,6 +64,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 硬盘错误"
         description: "机器硬盘错误，指标为0表示正常，非0表示异常，当前指标值 = {{ $value }} 告警标签 = {{ $labels }}"
 
     - alert: 网卡入向丢包
@@ -66,6 +73,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 网卡入向丢包"
         description: "过去 2 分钟丢了 {{ $value }} 个包。 告警标签 = {{ $labels }}"
 
     - alert: 网卡出向丢包
@@ -74,6 +82,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 网卡出向丢包"
         description: "过去 2 分钟丢了 {{ $value }} 个包。 告警标签 = {{ $labels }}"
 
     - alert: 网卡入向错包
@@ -82,6 +91,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 网卡入向错包"
         description: "过去 2 分钟出现 {{ $value }} 个错包。 告警标签 = {{ $labels }}"
 
     - alert: 网卡出向错包
@@ -90,6 +100,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 网卡出向错包"
         description: "过去 2 分钟出现 {{ $value }} 个错包。 告警标签 = {{ $labels }}"
 
     - alert: Conntrack表项利用率高
@@ -98,6 +109,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} Conntrack表项利用率高"
         description: "Conntrack表项利用率 = {{ $value }}%，可以通过内核参数调大限制。 告警标签 = {{ $labels }}"
 
     - alert: 系统级文件句柄利用率高
@@ -106,6 +118,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 系统级文件句柄利用率高"
         description: "系统级文件句柄利用率 = {{ $value }}% 告警标签 = {{ $labels }}"
 
     - alert: TIME_WAIT连接过多
@@ -114,6 +127,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} TIME_WAIT 连接数过多"
         description: "TIME_WAIT 连接数 = {{ $value }} 告警标签 = {{ $labels }}"
 
     - alert: OOMKill
@@ -122,6 +136,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 有进程被 OOM 杀掉"
         description: "最近 5 分钟出现 {{ $value }} 次 OOM。只有高版本内核才有这个指标。告警标签 = {{ $labels }}"
 
     - alert: NTP时间偏移过大
@@ -130,6 +145,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} NTP时间偏移过大"
         description: "NTP 偏移时间 = {{ $value }}ms，一般来讲，分布式系统要求机器时间要校准。告警标签 = {{ $labels }}"
 
     - alert: PING探测失败
@@ -138,6 +154,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "PING探测失败"
         description: "PING探测失败，指标值为0表示正常，非0表示异常，当前值 = {{ $value }} 告警标签 = {{ $labels }}"
 
     - alert: HTTP地址探测失败
@@ -146,6 +163,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "HTTP 地址探测失败"
         description: "HTTP 探测失败，当前错误码 = {{ $value }}（不同错误码含义：1-ConnectionFailed, 2-Timeout, 3-DNSError, 4-AddressError, 5-BodyMismatch, 6-CodeMismatch） 告警标签 = {{ $labels }}"
 
     - alert: TCP或UDP探测失败
@@ -154,6 +172,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "TCP 或 UDP 探测失败"
         description: "TCP 或 UDP 探测失败，当前错误码 = {{ $value }}（不同错误码含义：1-Timeout, 2-ConnectionFailed, 3-ReadFailed, 4-StringMismatch） 告警标签 = {{ $labels }}"
 
     - alert: 进程挂了
@@ -162,6 +181,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "某进程挂了"
         description: "使用 procstat 插件发现某进程数量为0。告警标签 = {{ $labels }}"
 
     - alert: 进程句柄限制过小
@@ -170,6 +190,7 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "某进程句柄限制过小"
         description: "使用 procstat 插件发现某进程句柄限制为 = {{ $value }} 告警标签 = {{ $labels }}"
 
     - alert: 进程数量过多
@@ -178,4 +199,5 @@ groups:
       labels:
         severity: warning
       annotations:
+        summary: "机器 {{ $labels.ident }} 进程数量过多"
         description: "进程数量过多，当前值 = {{ $value }}。请检查是否符合预期，如果符合预期请调大告警规则的阈值。告警标签 = {{ $labels }}"
