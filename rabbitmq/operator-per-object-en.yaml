@@ -1,0 +1,40 @@
+groups:
+- name: rabbitmq
+  rules:
+  - alert: QueueHasNoConsumers
+    expr: |
+        (
+          ((rabbitmq_detailed_queue_consumers{vhost="/", queue=~".*"} == 0) + rabbitmq_detailed_queue_messages) > 0
+        ) * on (instance, job) group_left(rabbitmq_cluster) rabbitmq_identity_info
+    for: 10m
+    annotations:
+      description: |
+        Over the last 10 minutes, non-empty queue `{{ $labels.queue }}` with {{ $value }} messages
+        in virtual host `{{ $labels.vhost }}` didn't have any consumers in
+        RabbitMQ cluster `{{ $labels.rabbitmq_cluster }}` in namespace `{{ $labels.namespace }}`.
+      summary: |
+        Messages are sitting idle in the queue, without any processing.
+        This alert is highly application specific (and e.g. doesn't make sense for stream queues).
+    labels:
+      rulesgroup: rabbitmq
+      severity: warning
+
+  - alert: QueueIsGrowing
+    # `> 1` because of floating point rounding errors
+    expr: |
+        (
+            avg_over_time(rabbitmq_detailed_queue_messages[10m]) - avg_over_time(rabbitmq_detailed_queue_messages[10m] offset 1m) > 1
+        ) * on (instance, job) group_left(rabbitmq_cluster) rabbitmq_identity_info
+    for: 10m
+    annotations:
+      description: |
+        Over the last 10 minutes, queue `{{ $labels.queue }}` in virtual host `{{ $labels.vhost }}`
+        was growing. 10 minute moving average has grown by {{ $value }}.
+        This happens in RabbitMQ cluster `{{ $labels.rabbitmq_cluster }}` in namespace `{{ $labels.namespace }}`.
+      summary: |
+        Queue size is steadily growing over time.
+    labels:
+      rulesgroup: rabbitmq
+      severity: warning
+
+
